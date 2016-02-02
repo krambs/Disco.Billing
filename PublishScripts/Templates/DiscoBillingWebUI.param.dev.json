@@ -1,0 +1,32 @@
+{
+  "siteName": {
+    "value": "discobilling"
+  },
+  "hostingPlanName": {
+    "value": "DiscoOperations"
+  },
+  "siteLocation": {
+    "value": "South Central US"
+  },
+  "sku": {
+    "value": "Shared"
+  },
+  "workerSize": {
+    "value": "0"
+  },
+  "serverName": {
+    "value": "discobilling"
+  },
+  "serverLocation": {
+    "value": "South Central US"
+  },
+  "administratorLogin": {
+    "value": "discoadmin"
+  },
+  "administratorLoginPassword": {
+    "value": "mccr1ngleberry!"
+  },
+  "databaseName": {
+    "value": "discobilling_db"
+  }
+}

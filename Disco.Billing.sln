@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Disco.Billing.WebUI", "Disco.Billing.WebUI\Disco.Billing.WebUI.xproj", "{E9F6B560-E8A2-4A9D-B4F5-DEAB17BC6339}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PublishScripts", "PublishScripts", "{F7E6CBA1-5B02-46AE-BF44-0BB4F18508B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{06EBA7D5-8D46-4AA9-A166-2F1E84A75E37}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\Scripts\Deploy-AzureResourceGroup.ps1 = PublishScripts\Scripts\Deploy-AzureResourceGroup.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{46B664FF-BE54-409D-A383-360E68B03F4D}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\Templates\DiscoBillingWebUI.json = PublishScripts\Templates\DiscoBillingWebUI.json
+		PublishScripts\Templates\DiscoBillingWebUI.param.dev.json = PublishScripts\Templates\DiscoBillingWebUI.param.dev.json
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E9F6B560-E8A2-4A9D-B4F5-DEAB17BC6339}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9F6B560-E8A2-4A9D-B4F5-DEAB17BC6339}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9F6B560-E8A2-4A9D-B4F5-DEAB17BC6339}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9F6B560-E8A2-4A9D-B4F5-DEAB17BC6339}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{06EBA7D5-8D46-4AA9-A166-2F1E84A75E37} = {F7E6CBA1-5B02-46AE-BF44-0BB4F18508B8}
+		{46B664FF-BE54-409D-A383-360E68B03F4D} = {F7E6CBA1-5B02-46AE-BF44-0BB4F18508B8}
+	EndGlobalSection
+EndGlobal
