@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "net451": {
+      "wrappedProject": "../../Disco.Billing.Salesforce/Disco.Billing.Salesforce.csproj",
+      "bin": {
+        "assembly": "../../Disco.Billing.Salesforce/obj/{configuration}/Disco.Billing.Salesforce.exe",
+        "pdb": "../../Disco.Billing.Salesforce/obj/{configuration}/Disco.Billing.Salesforce.pdb"
+      },
+      "dependencies": {
+        "DeveloperForce.Force": "1.2.3",
+        "Microsoft.Bcl": "1.1.10",
+        "Microsoft.Bcl.Async": "1.0.168",
+        "Microsoft.Bcl.Build": "1.0.21",
+        "Microsoft.Bcl.Compression": "3.9.85",
+        "Microsoft.Net.Http": "2.2.29",
+        "Newtonsoft.Json": "8.0.2"
+      }
+    }
+  }
+}
