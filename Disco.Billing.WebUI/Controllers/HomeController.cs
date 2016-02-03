@@ -1,24 +1,25 @@
-﻿using Disco.Billing.Salesforce;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
+using Microsoft.Extensions;
 using Microsoft.Extensions.OptionsModel;
 
 namespace Disco.Billing.WebUI.Controllers
 {
     public class HomeController : Controller
     {
+        private Options SalesforceOptions { get; }
+
         public HomeController(IOptions<Options> salesforceOptions)
         {
             SalesforceOptions = salesforceOptions.Value;
         }
 
-        private Options SalesforceOptions { get; }
-
         public IActionResult Index()
         {
-            ViewData["contract-count"] =
-                Data.GetData(SalesforceOptions.SalesforceConsumerKey,
-                    SalesforceOptions.SalesforceConsumerSecret, SalesforceOptions.SalesforceUsername,
-                    SalesforceOptions.SalesforcePassword).Result.Count;
+            ViewData["salesforce-username"] = SalesforceOptions.SalesforceUsername;
             return View();
         }
 

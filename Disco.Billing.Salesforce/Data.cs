@@ -10,13 +10,13 @@ namespace Disco.Billing.Salesforce
     {
         public static void Main()
         {
-            
+            Task task = GetData();
+            task.Wait();
         }
 
-        public static async Task<List<Contract>> GetData(string consumerKey, string consumerSecret, string username,
-            string password)
+        public static async Task<List<Contract>> GetData()
         {
-            var client = await GetSalesforceAPIClient(consumerKey, consumerSecret, username, password);
+            var client = await GetSalesforceAPIClient();
             var contracts = await client.QueryAsync<Contract>("SELECT Id, AccountId FROM Contract");
             foreach (var contract in contracts.Records)
             {
@@ -26,11 +26,15 @@ namespace Disco.Billing.Salesforce
             return contracts.Records;
         }
 
-        private static async Task<ForceClient> GetSalesforceAPIClient(string consumerKey, string consumerSecret,
-            string username, string password)
+        private static async Task<ForceClient> GetSalesforceAPIClient()
         {
+            var consumerkey = "3MVG9xOCXq4ID1uH0ryjWe8f1uFUbiypZoLbUoX0V152kKakkInuJfMbZloj8Mt5LbLAbwGcv5s97PG3oV0yH";
+            var consumersecret = "8899212903892392295";
+            var username = "hagan@csdisco.com";
+            var password = "B364277YJT8q2Qp";
+
             var authenticationClient = new AuthenticationClient();
-            await authenticationClient.UsernamePasswordAsync(consumerKey, consumerSecret, username, password);
+            await authenticationClient.UsernamePasswordAsync(consumerkey, consumersecret, username, password);
 
             var instanceUrl = authenticationClient.InstanceUrl;
             var accessToken = authenticationClient.AccessToken;
