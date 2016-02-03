@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Salesforce.Common;
-using Salesforce.Common.Models;
 using Salesforce.Force;
 
 namespace Disco.Billing.Salesforce
@@ -15,17 +12,18 @@ namespace Disco.Billing.Salesforce
         {
             Task task = GetData();
             task.Wait();
-
         }
 
-        private static async Task GetData()
+        public static async Task<List<Contract>> GetData()
         {
-            ForceClient client = await GetSalesforceAPIClient();
-            QueryResult<Contract> contracts = await client.QueryAsync<Contract>("SELECT Id, AccountId FROM Contract");
+            var client = await GetSalesforceAPIClient();
+            var contracts = await client.QueryAsync<Contract>("SELECT Id, AccountId FROM Contract");
             foreach (var contract in contracts.Records)
             {
                 Console.WriteLine(contract.AccountId);
             }
+
+            return contracts.Records;
         }
 
         private static async Task<ForceClient> GetSalesforceAPIClient()
