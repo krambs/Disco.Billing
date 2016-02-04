@@ -1,39 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Extensions;
 using Microsoft.Extensions.OptionsModel;
 
 namespace Disco.Billing.WebUI.Controllers
 {
     public class HomeController : Controller
     {
-        private Options SalesforceOptions { get; }
-
         public HomeController(IOptions<Options> salesforceOptions)
         {
             SalesforceOptions = salesforceOptions.Value;
         }
 
+        private Options SalesforceOptions { get; }
+
         public IActionResult Index()
         {
-            ViewData["salesforce-username"] = SalesforceOptions.SalesforceUsername;
-            return View();
-        }
-
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
+            ViewData["buttsauce"] = Data.Salesforce.GetData(SalesforceOptions.SalesforceConsumerKey, SalesforceOptions.SalesforceConsumerSecret,
+                SalesforceOptions.SalesforceUsername, SalesforceOptions.SalesforcePassword).Result.GroupBy(contract => contract.AccountId).Count();
             return View();
         }
 

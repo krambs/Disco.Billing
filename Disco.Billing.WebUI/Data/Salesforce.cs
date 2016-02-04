@@ -4,14 +4,10 @@ using System.Threading.Tasks;
 using Salesforce.Common;
 using Salesforce.Force;
 
-namespace Disco.Billing.Salesforce
+namespace Disco.Billing.WebUI.Data
 {
-    public class Data
+    public class Salesforce
     {
-        public static void Main()
-        {
-        }
-
         public static async Task<List<Contract>> GetData(string consumerKey, string consumerSecret, string username,
             string password)
         {
