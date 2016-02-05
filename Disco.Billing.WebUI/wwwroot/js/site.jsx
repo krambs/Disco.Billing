@@ -1,13 +1,42 @@
-﻿var CommentBox = React.createClass({
-    render: function() {
+﻿var BillingSummary = React.createClass({
+    getInitialState: function() {
+        return { data: [] };
+    },
+    componentDidMount: function() {
+        $.ajax({
+            url: "home/BillingData",
+            dataType: "json",
+            cache: false,
+            success: function(data) {
+                this.setState({ data: data });
+            }.bind(this)
+        });
+    },
+    render: function () {
+        let accountSummaries = [];
+
         return (
-          <div className="commentBox">
-            Hello, world! I am a CommentBox.
-          </div>
-      );
+            <div>
+                <h1>Billing Summary</h1>
+                {
+                    this.state.data.map(
+                        function(item) {
+                             return <BillingSummary.AccountSummary />;
+                        }
+                    )
+                }
+            </div>
+        );
     }
 });
+
+BillingSummary.AccountSummary = props => (
+    <div>
+        Gabe Rules
+    </div>
+);
+
 ReactDOM.render(
-  <CommentBox />,
-  document.getElementById('content')
+    <BillingSummary />,
+    document.getElementById("content")
 );

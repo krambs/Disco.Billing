@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.OptionsModel;
+using Newtonsoft.Json;
 
 namespace Disco.Billing.WebUI.Controllers
 {
@@ -15,9 +16,17 @@ namespace Disco.Billing.WebUI.Controllers
 
         public IActionResult Index()
         {
-            ViewData["buttsauce"] = Data.Salesforce.GetData(SalesforceOptions.SalesforceConsumerKey, SalesforceOptions.SalesforceConsumerSecret,
-                SalesforceOptions.SalesforceUsername, SalesforceOptions.SalesforcePassword).Result.GroupBy(contract => contract.AccountId).Count();
             return View();
+        }
+
+        [HttpGet]
+        public IActionResult BillingData()
+        {
+            var data = Data.Salesforce.GetData(SalesforceOptions.SalesforceConsumerKey, SalesforceOptions.SalesforceConsumerSecret,
+                SalesforceOptions.SalesforceUsername, SalesforceOptions.SalesforcePassword)
+                .Result.GroupBy(contract => contract.AccountId);
+
+            return Json(data);
         }
 
         public IActionResult Error()

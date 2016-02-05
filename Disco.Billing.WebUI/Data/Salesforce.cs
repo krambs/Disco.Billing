@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Salesforce.Common;
 using Salesforce.Force;
@@ -12,12 +12,7 @@ namespace Disco.Billing.WebUI.Data
             string password)
         {
             var client = await GetSalesforceAPIClient(consumerKey, consumerSecret, username, password);
-            var contracts = await client.QueryAsync<Contract>("SELECT Id, AccountId FROM Contract");
-            foreach (var contract in contracts.Records)
-            {
-                Console.WriteLine(contract.AccountId);
-            }
-
+            var contracts = await client.QueryAsync<Contract>(CreateSQLQueryFromSalesforceObject(new Contract()));
             return contracts.Records;
         }
 
@@ -33,11 +28,23 @@ namespace Disco.Billing.WebUI.Data
 
             return new ForceClient(instanceUrl, accessToken, apiVersion);
         }
+
+        private static string CreateSQLQueryFromSalesforceObject(object salesforceObjectToCreateSQLQueryFor)
+        {
+            return
+                $"SELECT {string.Join(", ", GetPropertyNamesFromObject(salesforceObjectToCreateSQLQueryFor))} FROM {salesforceObjectToCreateSQLQueryFor.GetType().Name}";
+        }
+
+        private static IEnumerable<string> GetPropertyNamesFromObject(object objectToGetPropertyNamesFrom)
+        {
+            return objectToGetPropertyNamesFrom.GetType().GetProperties().Select(property => property.Name);
+        }
     }
 
     public class Contract
     {
         public string Id { get; set; }
         public string AccountId { get; set; }
+        public string BillingAccount__c { get; set; }
     }
 }
