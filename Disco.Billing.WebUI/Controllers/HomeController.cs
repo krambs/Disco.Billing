@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.OptionsModel;
-using Newtonsoft.Json;
 
 namespace Disco.Billing.WebUI.Controllers
 {
@@ -22,9 +21,7 @@ namespace Disco.Billing.WebUI.Controllers
         [HttpGet]
         public IActionResult BillingData()
         {
-            var data = Data.Salesforce.GetData(SalesforceOptions.SalesforceConsumerKey, SalesforceOptions.SalesforceConsumerSecret,
-                SalesforceOptions.SalesforceUsername, SalesforceOptions.SalesforcePassword)
-                .Result.GroupBy(contract => contract.AccountId);
+            var data = Data.Disco.Disco.GetData(SalesforceOptions).GroupBy(discoContract => discoContract.BillingAccount);
 
             return Json(data);
         }
