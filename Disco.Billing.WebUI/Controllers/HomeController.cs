@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Disco.Billing.WebUI.DataRepository.Disco;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.OptionsModel;
 
@@ -21,9 +22,19 @@ namespace Disco.Billing.WebUI.Controllers
         [HttpGet]
         public IActionResult BillingData()
         {
-            var data = Data.Disco.Disco.GetData(SalesforceOptions).GroupBy(discoContract => discoContract.BillingAccount);
+            var contractsGroupedByBillingAccount =
+                Data.GetData(SalesforceOptions).GroupBy(discoContract => discoContract.BillingAccount.Id);
 
-            return Json(data);
+            return
+                Json(
+                    contractsGroupedByBillingAccount.Select(
+                        group =>
+                            new
+                            {
+                                BillingAccountName = group.First().BillingAccount.Name,
+                                BillingAccountId = group.First().BillingAccount.Id,
+                                Contracts = group.ToList()
+                            }).OrderBy(group => group.BillingAccountName));
         }
 
         public IActionResult Error()

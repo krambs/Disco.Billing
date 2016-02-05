@@ -13,15 +13,16 @@
         });
     },
     render: function () {
-        let accountSummaries = [];
-
         return (
             <div>
                 <h1>Billing Summary</h1>
                 {
                     this.state.data.map(
-                        function(item) {
-                             return <BillingSummary.AccountSummary />;
+                        function(billingAccountContractGroup) {
+                            return <BillingSummary.AccountSummary 
+                                    key={billingAccountContractGroup.BillingAccountId}
+                                    billingAccountName={billingAccountContractGroup.BillingAccountName}
+                                    contracts={billingAccountContractGroup.Contracts} />;
                         }
                     )
                 }
@@ -32,7 +33,7 @@
 
 BillingSummary.AccountSummary = props => (
     <div>
-        Gabe Rules
+        <h3>{props.billingAccountName}</h3>
     </div>
 );
 

@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.OptionsModel;
 using Salesforce.Common;
 using Salesforce.Common.Models;
 using Salesforce.Force;
 
-namespace Disco.Billing.WebUI.Data.Salesforce
+namespace Disco.Billing.WebUI.DataRepository.Salesforce
 {
-    public class Salesforce
+    public class Data
     {
         public static SalesforceData GetData(Options salesforceOptions)
         {
