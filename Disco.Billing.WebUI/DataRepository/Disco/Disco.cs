@@ -32,6 +32,14 @@ namespace Disco.Billing.WebUI.DataRepository.Disco
                     Name = salesforceUserAccount.Name
                 };
 
+                if (salesforceContract.Matters__r != null)
+                {
+                    foreach (var matter in salesforceContract.Matters__r.Records)
+                    {
+                        discoContract.Matters.Add(new Matter {Id = matter.Id});
+                    }
+                }
+
                 discoContractsToReturn.Add(discoContract);
             }
 
@@ -43,11 +51,17 @@ namespace Disco.Billing.WebUI.DataRepository.Disco
     {
         public Account BillingAccount { get; set; }
         public Account UserAccount { get; set; }
+        public List<Matter> Matters { get; set; } = new List<Matter>();
     }
 
     public class Account
     {
         public string Id { get; set; }
         public string Name { get; set; }
+    }
+
+    public class Matter
+    {
+        public string Id { get; set; }
     }
 }

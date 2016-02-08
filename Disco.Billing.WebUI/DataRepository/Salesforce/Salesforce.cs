@@ -1,22 +1,25 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Salesforce.Common;
-using Salesforce.Common.Models;
 using Salesforce.Force;
 
 namespace Disco.Billing.WebUI.DataRepository.Salesforce
 {
     public class Data
     {
+        public static readonly string ContractsSOQLQuery =
+            "SELECT Id, AccountId, BillingAccount__c, (SELECT Id FROM Matters__r) FROM Contract";
+
+        public static readonly string AccountsSOQLQuery = "SELECT Id, Name FROM Account";
+
         public static SalesforceData GetData(Options salesforceOptions)
         {
             var salesforceData = new SalesforceData();
 
             var forceClient = GetSalesforceAPIClient(salesforceOptions).Result;
 
-            var getContractsTask = GetSalesforceObjects<Contract>(forceClient);
-            var getAccountsTask = GetSalesforceObjects<Account>(forceClient);
+            var getContractsTask = GetSalesforceObjects<Contract>(forceClient, ContractsSOQLQuery);
+            var getAccountsTask = GetSalesforceObjects<Account>(forceClient, AccountsSOQLQuery);
 
             salesforceData.Contracts = getContractsTask.Result;
             salesforceData.Accounts = getAccountsTask.Result;
@@ -24,11 +27,11 @@ namespace Disco.Billing.WebUI.DataRepository.Salesforce
             return salesforceData;
         }
 
-        private static async Task<List<T>> GetSalesforceObjects<T>(ForceClient forceClient)
+        private static async Task<List<T>> GetSalesforceObjects<T>(ForceClient forceClient, string soqlQuery)
         {
-            List<T> salesforceObjectsToReturn = new List<T>();
+            var salesforceObjectsToReturn = new List<T>();
 
-            QueryResult<T> queryResult = await forceClient.QueryAsync<T>(CreateSQLQueryFromSalesforceObject<T>());
+            var queryResult = await forceClient.QueryAsync<T>(soqlQuery);
             salesforceObjectsToReturn.AddRange(queryResult.Records);
 
             while (!string.IsNullOrEmpty(queryResult.NextRecordsUrl))
@@ -53,23 +56,12 @@ namespace Disco.Billing.WebUI.DataRepository.Salesforce
 
             return new ForceClient(instanceUrl, accessToken, apiVersion);
         }
-
-        private static string CreateSQLQueryFromSalesforceObject<T>()
-        {
-            return
-                $"SELECT {string.Join(", ", GetPropertyNamesFromObject<T>())} FROM {typeof (T).Name}";
-        }
-
-        private static IEnumerable<string> GetPropertyNamesFromObject<T>()
-        {
-            return typeof(T).GetProperties().Select(property => property.Name);
-        }
     }
 
     public class SalesforceData
     {
         public List<Contract> Contracts { get; set; }
-        public List<Account> Accounts { get; set; } 
+        public List<Account> Accounts { get; set; }
     }
 
     public class Contract
@@ -77,11 +69,33 @@ namespace Disco.Billing.WebUI.DataRepository.Salesforce
         public string Id { get; set; }
         public string AccountId { get; set; }
         public string BillingAccount__c { get; set; }
+        public Matters__r Matters__r { get; set; }
     }
 
     public class Account
     {
         public string Id { get; set; }
         public string Name { get; set; }
+    }
+
+    public class Matters__r
+    {
+        public List<Matter__c> Records { get; set; }
+    }
+
+    public class Matter__c
+    {
+        public string Id { get; set; }
+        public Datasets__r Datasets__r { get; set; }
+    }
+
+    public class Datasets__r
+    {
+        public List<Dataset__c> Records { get; set; }
+    }
+
+    public class Dataset__c
+    {
+        public decimal Data_Size__c { get; set; }
     }
 }

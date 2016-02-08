@@ -34,6 +34,7 @@
 BillingSummary.AccountSummary = props => (
     <div>
         <h3>{props.billingAccountName}</h3>
+        <h4>{props.contracts.reduce((previousValue, currentValue) => previousValue + currentValue.Matters.length, 0)}</h4>
     </div>
 );
 
