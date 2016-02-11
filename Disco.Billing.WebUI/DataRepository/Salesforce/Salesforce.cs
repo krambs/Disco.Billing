@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Salesforce.Common;
 using Salesforce.Force;
@@ -8,9 +9,12 @@ namespace Disco.Billing.WebUI.DataRepository.Salesforce
     public class Data
     {
         public static readonly string ContractsSOQLQuery =
-            "SELECT Id, AccountId, BillingAccount__c, (SELECT Id FROM Matters__r) FROM Contract";
+            "SELECT Id, AccountId, BillingAccount__c, Type__c, (SELECT Id FROM Matters__r) FROM Contract";
 
         public static readonly string AccountsSOQLQuery = "SELECT Id, Name FROM Account";
+
+        public static readonly string MattersSOQLQuery =
+            "SELECT DeactivationDate__c, Name, Id, (SELECT Data_Size__c,CreatedDate FROM Datasets__r) FROM Matter__c";
 
         public static SalesforceData GetData(Options salesforceOptions)
         {
@@ -20,9 +24,11 @@ namespace Disco.Billing.WebUI.DataRepository.Salesforce
 
             var getContractsTask = GetSalesforceObjects<Contract>(forceClient, ContractsSOQLQuery);
             var getAccountsTask = GetSalesforceObjects<Account>(forceClient, AccountsSOQLQuery);
+            var getMattersTask = GetSalesforceObjects<Matter__c>(forceClient, MattersSOQLQuery);
 
             salesforceData.Contracts = getContractsTask.Result;
             salesforceData.Accounts = getAccountsTask.Result;
+            salesforceData.Matters = getMattersTask.Result;
 
             return salesforceData;
         }
@@ -62,6 +68,7 @@ namespace Disco.Billing.WebUI.DataRepository.Salesforce
     {
         public List<Contract> Contracts { get; set; }
         public List<Account> Accounts { get; set; }
+        public List<Matter__c> Matters { get; set; }
     }
 
     public class Contract
@@ -70,6 +77,7 @@ namespace Disco.Billing.WebUI.DataRepository.Salesforce
         public string AccountId { get; set; }
         public string BillingAccount__c { get; set; }
         public Matters__r Matters__r { get; set; }
+        public string Type__c { get; set; }
     }
 
     public class Account
@@ -86,6 +94,8 @@ namespace Disco.Billing.WebUI.DataRepository.Salesforce
     public class Matter__c
     {
         public string Id { get; set; }
+        public string Name { get; set; }
+        public DateTime? DeactivationDate__c { get; set; }
         public Datasets__r Datasets__r { get; set; }
     }
 
@@ -97,5 +107,6 @@ namespace Disco.Billing.WebUI.DataRepository.Salesforce
     public class Dataset__c
     {
         public decimal Data_Size__c { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 }

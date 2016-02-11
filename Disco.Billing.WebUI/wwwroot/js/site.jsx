@@ -16,26 +16,40 @@
         return (
             <div>
                 <h1>Billing Summary</h1>
-                {
-                    this.state.data.map(
-                        function(billingAccountContractGroup) {
-                            return <BillingSummary.AccountSummary 
-                                    key={billingAccountContractGroup.BillingAccountId}
-                                    billingAccountName={billingAccountContractGroup.BillingAccountName}
-                                    contracts={billingAccountContractGroup.Contracts} />;
+                <table className="table table-sm">
+                    <thead></thead>
+                    <tbody>
+                        {
+                            this.state.data.map(
+                                function(billingAccountContractGroup) {
+                                    return <BillingSummary.AccountRow key={billingAccountContractGroup.BillingAccountId}
+                                                       billingAccountName={billingAccountContractGroup.BillingAccountName}
+                                                       contracts={billingAccountContractGroup.Contracts} />;
+                                }
+                            )
                         }
-                    )
-                }
+                    </tbody>
+                </table>
+                
             </div>
         );
     }
 });
 
-BillingSummary.AccountSummary = props => (
-    <div>
-        <h3>{props.billingAccountName}</h3>
-        <h4>{props.contracts.reduce((previousValue, currentValue) => previousValue + currentValue.Matters.length, 0)}</h4>
-    </div>
+BillingSummary.AccountRow = props => (
+    <tr>
+        <td>{props.billingAccountName}</td>
+        <td>{
+                currencyFormatter.format(
+                    props.contracts.reduce(
+                        function (previous, current) {
+                            return previous + calculateContractBillingOnDate(current, moment.utc("2016-01-01"));
+                        },
+                        0
+                    )
+                )
+            }</td>
+    </tr>
 );
 
 ReactDOM.render(
