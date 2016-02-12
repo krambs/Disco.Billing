@@ -49,6 +49,7 @@ namespace Disco.Billing.WebUI
                 .AddDefaultTokenProviders();
 
             services.AddMvc();
+            services.AddCaching();
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();

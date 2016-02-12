@@ -16,7 +16,7 @@ function calculateContractBillingOnDate(contract, date) {
 function calculateMatterBillingOnDate(contract, matter, date) {
     return matter.DataSets.reduce(
         function(previous, current) {
-            return previous + current.DataSize;
+            return previous + current.DataSize * contract.TransactionalPricePerGB;
         },
         0
     );

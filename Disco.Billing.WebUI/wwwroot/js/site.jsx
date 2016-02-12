@@ -1,6 +1,9 @@
 ﻿var BillingSummary = React.createClass({
     getInitialState: function() {
-        return { data: [] };
+        return {
+            data: [],
+            invoiceDate: moment.utc("2016-02-01")
+        };
     },
     componentDidMount: function() {
         $.ajax({
@@ -13,28 +16,77 @@
         });
     },
     render: function () {
+        const invoiceDate = this.state.invoiceDate;
+
         return (
             <div>
-                <h1>Billing Summary</h1>
-                <table className="table table-sm">
-                    <thead></thead>
-                    <tbody>
-                        {
-                            this.state.data.map(
-                                function(billingAccountContractGroup) {
-                                    return <BillingSummary.AccountRow key={billingAccountContractGroup.BillingAccountId}
-                                                       billingAccountName={billingAccountContractGroup.BillingAccountName}
-                                                       contracts={billingAccountContractGroup.Contracts} />;
-                                }
-                            )
+                
+                {
+                    this.state.data.map(
+                        function(billingAccountContractGroup) {
+                            return <BillingSummary.InvoiceTable 
+                                    key={billingAccountContractGroup.BillingAccountId}
+                                    billingAccountName={billingAccountContractGroup.BillingAccountName}
+                                    contracts={billingAccountContractGroup.Contracts} 
+                                    invoiceDate={invoiceDate} 
+                                    oneMonthBeforeInvoiceDate={invoiceDate.add(-1, "month")} />;
                         }
-                    </tbody>
-                </table>
+                    )
+                }
                 
             </div>
         );
     }
 });
+
+BillingSummary.InvoiceTable = props => (
+    <div className="invoice">
+        <div className="invoice-header clearfix">
+            <h2>{props.billingAccountName}</h2>
+            <div className="invoice-header-stamp">
+                INVOICE
+            </div>
+        </div>
+        {
+            props.contracts.map(
+                contract => contract.Matters.map(
+                    matter => <BillingSummary.MatterSection 
+                                key={matter.Name} 
+                                matter={matter} 
+                                invoiceDate={props.invoiceDate} 
+                                oneMonthBeforeInvoiceDate={props.oneMonthBeforeInvoiceDate} />
+                )
+            )
+        }
+    </div>
+);
+
+BillingSummary.MatterSection = props => {
+    var dataSetEntries = [];
+    props.matter.DataSets
+        .filter(dataSet => dataSet.DataSize > 0)
+        .forEach(dataSet => {
+            dataSetEntries.push(<BillingSummary.DataSetEntry key={dataSet.CreatedDate} createdDate={dataSet.CreatedDate} dataSize={dataSet.DataSize} />);
+        }
+    );
+
+    return(
+        <div>
+            <h3>{props.matter.Name}</h3>
+            <div>Existing data: 
+                {
+                    props.matter.DataSets
+                        .filter(dataSet => moment.utc(dataSet.CreatedDate).isBefore(props.oneMonthBeforeInvoiceDate))
+                        .reduce((previous, current) => previous + current.DataSize, 0)
+                }
+            </div>
+        </div>
+    );
+};
+
+BillingSummary.DataSetEntry = props => (
+    <div>{moment.utc(props.createdDate).format("l")} {props.dataSize}</div>
+);
 
 BillingSummary.AccountRow = props => (
     <tr>
@@ -43,7 +95,7 @@ BillingSummary.AccountRow = props => (
                 currencyFormatter.format(
                     props.contracts.reduce(
                         function (previous, current) {
-                            return previous + calculateContractBillingOnDate(current, moment.utc("2016-01-01"));
+                            return previous + calculateContractBillingOnDate(current, moment.utc("2016-02-01"));
                         },
                         0
                     )

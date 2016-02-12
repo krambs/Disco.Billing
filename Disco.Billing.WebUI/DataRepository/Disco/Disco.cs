@@ -17,6 +17,7 @@ namespace Disco.Billing.WebUI.DataRepository.Disco
                 var discoContract = new Contract
                 {
                     Type = salesforceContract.Type__c,
+                    TransactionalPricePerGB = salesforceContract.Price_Per_GB__c ?? 0,
                     BillingAccount = CreateDiscoAccountFromAccountId(salesforceData,
                         salesforceContract.BillingAccount__c),
                     UserAccount = CreateDiscoAccountFromAccountId(salesforceData,
@@ -68,6 +69,7 @@ namespace Disco.Billing.WebUI.DataRepository.Disco
         public Account UserAccount { get; set; }
         public List<Matter> Matters { get; set; } = new List<Matter>();
         public string Type { get; set; }
+        public decimal TransactionalPricePerGB { get; set; }
     }
 
     public class Account

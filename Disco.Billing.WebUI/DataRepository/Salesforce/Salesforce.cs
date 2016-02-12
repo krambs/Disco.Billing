@@ -9,7 +9,7 @@ namespace Disco.Billing.WebUI.DataRepository.Salesforce
     public class Data
     {
         public static readonly string ContractsSOQLQuery =
-            "SELECT Id, AccountId, BillingAccount__c, Type__c, (SELECT Id FROM Matters__r) FROM Contract";
+            "SELECT Id, AccountId, BillingAccount__c, Type__c, EndDate, SubscriptionPricePerMonth__c, SubscriptionPerGbOveragePrice__c, SubscriptionDataLimit__c, Price_Per_GB__c, Price_per_GB_Cold_Storage__c, MinimumContractCharge__c, MinimumMatterCharge__c, MaximumMatterCharge__c, InvoicePerMatter__c, InvoiceFrequency__c, InvoiceByAccount__c, ForwardBilling__c, StartDate, (SELECT Id FROM Matters__r) FROM Contract";
 
         public static readonly string AccountsSOQLQuery = "SELECT Id, Name FROM Account";
 
@@ -78,6 +78,20 @@ namespace Disco.Billing.WebUI.DataRepository.Salesforce
         public string BillingAccount__c { get; set; }
         public Matters__r Matters__r { get; set; }
         public string Type__c { get; set; }
+        public DateTime? EndDate { get; set; }
+        public decimal? SubscriptionPricePerMonth__c { get; set; }
+        public decimal? SubscriptionPerGbOveragePrice__c { get; set; }
+        public decimal? SubscriptionDataLimit__c { get; set; }
+        public decimal? Price_Per_GB__c { get; set; }
+        public decimal? Price_per_GB_Cold_Storage__c { get; set; }
+        public decimal? MinimumContractCharge__c { get; set; }
+        public decimal? MinimumMatterCharge__c { get; set; }
+        public decimal? MaximumMatterCharge__c { get; set; }
+        public bool InvoicePerMatter__c { get; set; }
+        public decimal? InvoiceFrequency__c { get; set; }
+        public bool InvoiceByAccount__c { get; set; }
+        public bool ForwardBilling__c { get; set; }
+        public DateTime? StartDate { get; set; }
     }
 
     public class Account

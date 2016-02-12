@@ -1,18 +1,26 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Disco.Billing.WebUI.DataRepository.Disco;
 using Microsoft.AspNet.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.OptionsModel;
 
 namespace Disco.Billing.WebUI.Controllers
 {
     public class HomeController : Controller
     {
-        public HomeController(IOptions<Options> salesforceOptions)
+        private const string BillingDataCacheKey = "BillingData";
+
+        public HomeController(IOptions<Options> salesforceOptions, IMemoryCache cache)
         {
+            Cache = cache;
             SalesforceOptions = salesforceOptions.Value;
         }
 
         private Options SalesforceOptions { get; }
+        private IMemoryCache Cache { get; }
+
 
         public IActionResult Index()
         {
@@ -23,7 +31,14 @@ namespace Disco.Billing.WebUI.Controllers
         public IActionResult BillingData()
         {
             var contractsGroupedByBillingAccount =
-                Data.GetData(SalesforceOptions).GroupBy(discoContract => discoContract.BillingAccount.Id);
+                Cache.Get(BillingDataCacheKey) as IEnumerable<IGrouping<string, Contract>>;
+            if (contractsGroupedByBillingAccount == null)
+            {
+                contractsGroupedByBillingAccount =
+                    Data.GetData(SalesforceOptions).GroupBy(discoContract => discoContract.BillingAccount.Id);
+                Cache.Set(BillingDataCacheKey, contractsGroupedByBillingAccount,
+                    new MemoryCacheEntryOptions {SlidingExpiration = TimeSpan.FromHours(1)});
+            }
 
             return
                 Json(
@@ -34,7 +49,7 @@ namespace Disco.Billing.WebUI.Controllers
                                 BillingAccountName = group.First().BillingAccount.Name,
                                 BillingAccountId = group.First().BillingAccount.Id,
                                 Contracts = group.ToList()
-                            }).OrderBy(group => group.BillingAccountName));
+                            }).Where(group => group.BillingAccountName.Contains("Castle")).OrderBy(group => group.BillingAccountName));
         }
 
         public IActionResult Error()
