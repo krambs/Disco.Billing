@@ -37,7 +37,43 @@
         float: left;
     }
 
-    .invoice-header-stamp {
-        float: right;
-    } 
+    h3 {
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .matter-section {
+        border: 1px solid #eee;
+        padding: 10px;
+
+        table {
+            width: 100%;
+
+        tr.header {
+            td {
+                text-align: right;
+                 padding-top: 30px;
+            }
+        }
+            td {
+                border: 0px solid #eee;
+            }
+        }
+    }
+
+    .invoice-header {
+        margin-bottom: 30px;
+
+        .invoice-header-stamp {
+            float: right;
+            font-weight: 300;
+            font-size: 1.4rem;
+            text-align: center;
+
+            .invoice-header-stamp-date {
+                font-size: 1rem;
+                font-weight: bold;
+            }
+        }
+    }
 }

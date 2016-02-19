@@ -29,7 +29,7 @@
                                     billingAccountName={billingAccountContractGroup.BillingAccountName}
                                     contracts={billingAccountContractGroup.Contracts} 
                                     invoiceDate={invoiceDate} 
-                                    oneMonthBeforeInvoiceDate={invoiceDate.add(-1, "month")} />;
+                                    oneMonthBeforeInvoiceDate={moment.utc(invoiceDate).add(-1, "month")} />;
                         }
                     )
                 }
@@ -45,14 +45,18 @@ BillingSummary.InvoiceTable = props => (
             <h2>{props.billingAccountName}</h2>
             <div className="invoice-header-stamp">
                 INVOICE
+                <div className="invoice-header-stamp-date">{props.invoiceDate.format("L")}</div>
             </div>
         </div>
+
+        <h3>Matters</h3>
         {
             props.contracts.map(
                 contract => contract.Matters.map(
                     matter => <BillingSummary.MatterSection 
                                 key={matter.Name} 
                                 matter={matter} 
+                                contract={contract}
                                 invoiceDate={props.invoiceDate} 
                                 oneMonthBeforeInvoiceDate={props.oneMonthBeforeInvoiceDate} />
                 )
@@ -62,25 +66,99 @@ BillingSummary.InvoiceTable = props => (
 );
 
 BillingSummary.MatterSection = props => {
-    var dataSetEntries = [];
-    props.matter.DataSets
-        .filter(dataSet => dataSet.DataSize > 0)
-        .forEach(dataSet => {
-            dataSetEntries.push(<BillingSummary.DataSetEntry key={dataSet.CreatedDate} createdDate={dataSet.CreatedDate} dataSize={dataSet.DataSize} />);
-        }
-    );
+    const existingDataSize = props.matter.DataSets
+        .filter(dataSet => moment.utc(dataSet.CreatedDate).isBefore(props.oneMonthBeforeInvoiceDate))
+        .reduce((previous, current) => previous + current.DataSize, 0);
 
-    return(
-        <div>
-            <h3>{props.matter.Name}</h3>
-            <div>Existing data: 
-                {
-                    props.matter.DataSets
-                        .filter(dataSet => moment.utc(dataSet.CreatedDate).isBefore(props.oneMonthBeforeInvoiceDate))
-                        .reduce((previous, current) => previous + current.DataSize, 0)
-                }
-            </div>
+    const addedData = _.chain(props.matter.DataSets)
+        .filter(dataSet => dataSet.DataSize > 0 && moment.utc(dataSet.CreatedDate).isBefore(props.invoiceDate) && !moment.utc(dataSet.CreatedDate).isBefore(props.oneMonthBeforeInvoiceDate))
+        .groupBy(dataSet => moment.utc(dataSet.CreatedDate).format("YYYY-MM-DD"))
+        .toPairs()
+        .value();
+
+    console.log(addedData)
+
+    const addedDataRows = _.chain(addedData)
+        .map(dataSetGroup => <BillingSummary.AddedDataRow key={dataSetGroup[0]} dataSize={_.sumBy(dataSetGroup[1], "DataSize")} createdDate={moment.utc(dataSetGroup[0])} transactionalPricePerGB={props.contract.TransactionalPricePerGB}/>)
+        .value();
+
+    let addedDataHeader = null;
+    let addedDataTotalHeader = null;
+    let addedDataTotal = null;
+    if (addedDataRows.length) {
+        addedDataHeader = (
+            <tr className="header">
+                <td></td>
+                <td style={{textTransform: "uppercase"}} className="text-md-right">Data added last month</td>
+                <td></td>
+                <td></td>
+                <td className="small text-muted">PRORATED</td>
+            </tr>
+        );
+
+        addedDataTotalHeader = <BillingSummary.AddedDataTotalHeader />;
+        addedDataTotal = <BillingSummary.AddedDataTotal />
+    }
+    
+    return (
+        <div className="matter-section">
+            <table>
+                <tbody>
+                    <tr>
+                        <td colSpan="4"><h4>{props.matter.Name}</h4></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td style={{textTransform: "uppercase"}} className="text-md-right">Existing data</td>
+                        <td className="text-md-right">{existingDataSize} GB</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {addedDataHeader}
+                    {addedDataRows}
+                    {addedDataTotalHeader}
+                </tbody>
+            </table>
         </div>
+    );
+};
+
+BillingSummary.AddedDataRow = props => {
+    const monthName = props.createdDate.format("MMMM");
+    const daysInMonth = moment.utc(props.createdDate).endOf("month").date();
+    const daysDataActive = daysInMonth - props.createdDate.date() + 1;
+    return(
+        <tr>
+            <td></td>
+            <td className="text-md-right">{props.createdDate.format('l')}</td>
+            <td className="text-md-right">{props.dataSize} GB</td>
+            <td className="text-md-right text-muted">${props.transactionalPricePerGB} / GB</td>
+            <td className="text-md-right">{accounting.formatMoney((daysDataActive / daysInMonth) * props.dataSize * props.transactionalPricePerGB)}</td>
+        </tr>
+    );
+};
+
+BillingSummary.AddedDataTotalHeader = props => {
+    return(
+        <tr className="header">
+            <td></td>
+            <td style={{textTransform: "uppercase"}} className="text-md-right font-weight-bold">January Total</td>
+            <td></td>
+            <td></td>
+            <td className="small text-muted">PRORATED</td>
+        </tr>
+    );
+};
+
+BillingSummary.AddedDataTotal = props => {
+    return(
+        <tr className="header">
+            <td></td>
+            <td style={{textTransform: "uppercase"}} className="text-md-right font-weight-bold">January Total</td>
+            <td></td>
+            <td></td>
+            <td className="small text-muted">PRORATED</td>
+        </tr>
     );
 };
 

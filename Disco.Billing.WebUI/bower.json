@@ -9,6 +9,8 @@
     "react": "~0.14.7",
     "tether": "~1.1.1",
     "babel": "https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js",
-    "moment": "2.10.6"
+    "moment": "2.10.6",
+    "accountingjs": "0.4.1",
+    "lodash": "4.3.0"
   }
 }

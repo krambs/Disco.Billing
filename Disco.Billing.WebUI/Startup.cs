@@ -64,7 +64,7 @@ namespace Disco.Billing.WebUI
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-
+            
             if (env.IsDevelopment())
             {
                 app.UseBrowserLink();

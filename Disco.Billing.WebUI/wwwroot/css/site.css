@@ -33,6 +33,34 @@ body {
   font-size: 2.5rem;
   float: left;
 }
-.invoice .invoice-header-stamp {
+.invoice h3 {
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.invoice .matter-section {
+  border: 1px solid #eee;
+  padding: 10px;
+}
+.invoice .matter-section table {
+  width: 100%;
+}
+.invoice .matter-section table tr.header td {
+  text-align: right;
+  padding-top: 30px;
+}
+.invoice .matter-section table td {
+  border: 0px solid #eee;
+}
+.invoice .invoice-header {
+  margin-bottom: 30px;
+}
+.invoice .invoice-header .invoice-header-stamp {
   float: right;
+  font-weight: 300;
+  font-size: 1.4rem;
+  text-align: center;
+}
+.invoice .invoice-header .invoice-header-stamp .invoice-header-stamp-date {
+  font-size: 1rem;
+  font-weight: bold;
 }
