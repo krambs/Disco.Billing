@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using Disco.Billing.WebUI.DataRepository.Disco;
+using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.OptionsModel;
 
 namespace Disco.Billing.WebUI.Controllers
 {
+    [Authorize]
+    [RequireHttps]
     public class HomeController : Controller
     {
         private const string BillingDataCacheKey = "BillingData";

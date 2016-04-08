@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using Disco.Billing.WebUI.Models;
 using Disco.Billing.WebUI.Services;
 using Disco.Billing.WebUI.ViewModels.Account;
+using Microsoft.AspNet.Http.Authentication;
+using Microsoft.Owin.Security;
 
 namespace Disco.Billing.WebUI.Controllers
 {
@@ -45,7 +47,10 @@ namespace Disco.Billing.WebUI.Controllers
         public IActionResult Login(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            return View();
+
+            var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+            return new ChallengeResult("Google", properties);
         }
 
         //
@@ -156,34 +161,41 @@ namespace Disco.Billing.WebUI.Controllers
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null)
         {
             var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
+            if (info == null || !info.ExternalPrincipal.FindFirstValue(ClaimTypes.Email).EndsWith("@csdisco.com"))
             {
                 return RedirectToAction(nameof(Login));
             }
 
             // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
-            if (result.Succeeded)
-            {
-                _logger.LogInformation(5, "User logged in with {Name} provider.", info.LoginProvider);
-                return RedirectToLocal(returnUrl);
-            }
-            if (result.RequiresTwoFactor)
-            {
-                return RedirectToAction(nameof(SendCode), new { ReturnUrl = returnUrl });
-            }
-            if (result.IsLockedOut)
-            {
-                return View("Lockout");
-            }
-            else
-            {
-                // If the user does not have an account, then ask the user to create an account.
-                ViewData["ReturnUrl"] = returnUrl;
-                ViewData["LoginProvider"] = info.LoginProvider;
-                var email = info.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
-                return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email });
-            }
+            //var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+
+
+            await HttpContext.Authentication.SignInAsync("GoogleAuthCookieMiddlewareInstance", info.ExternalPrincipal);
+
+
+            //if (result.Succeeded)
+            //{
+            //    _logger.LogInformation(5, "User logged in with {Name} provider.", info.LoginProvider);
+            //    return RedirectToLocal(returnUrl);
+            //}
+            //if (result.RequiresTwoFactor)
+            //{
+            //    return RedirectToAction(nameof(SendCode), new { ReturnUrl = returnUrl });
+            //}
+            //if (result.IsLockedOut)
+            //{
+            //    return View("Lockout");
+            //}
+            //else
+            //{
+            //    // If the user does not have an account, then ask the user to create an account.
+            //    ViewData["ReturnUrl"] = returnUrl;
+            //    ViewData["LoginProvider"] = info.LoginProvider;
+            //    var email = info.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
+            //    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email });
+            //}
+
+            return RedirectToLocal(returnUrl);
         }
 
         //
@@ -461,6 +473,24 @@ namespace Disco.Billing.WebUI.Controllers
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
         }
+
+        //private ActionResult SignInUser(string username, string returnUrl)
+        //{
+        //    if (!username.EndsWith("@csdisco.com"))
+        //    {
+        //        ViewBag.LoginError = "You must use a csdisco.com account to authenticate";
+        //        return View("ExternalLoginFailure");
+        //    }
+
+        //    var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) },
+        //              DefaultAuthenticationTypes.ApplicationCookie,
+        //              ClaimTypes.Name, ClaimTypes.Role);
+
+        //    AuthenticationManager.SignIn(identity);
+
+        //    return RedirectToLocal(returnUrl);
+        //}
+        
 
         #endregion
     }

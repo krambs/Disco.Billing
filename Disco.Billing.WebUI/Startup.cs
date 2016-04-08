@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Disco.Billing.WebUI.Models;
+using Disco.Billing.WebUI.Services;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
+using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Disco.Billing.WebUI.Models;
-using Disco.Billing.WebUI.Services;
 
 namespace Disco.Billing.WebUI
 {
@@ -21,7 +19,7 @@ namespace Disco.Billing.WebUI
             // Set up configuration sources.
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true);
 
             if (env.IsDevelopment())
             {
@@ -64,7 +62,7 @@ namespace Disco.Billing.WebUI
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            
+
             if (env.IsDevelopment())
             {
                 app.UseBrowserLink();
@@ -82,10 +80,12 @@ namespace Disco.Billing.WebUI
                         .CreateScope())
                     {
                         serviceScope.ServiceProvider.GetService<ApplicationDbContext>()
-                             .Database.Migrate();
+                            .Database.Migrate();
                     }
                 }
-                catch { }
+                catch
+                {
+                }
             }
 
             app.UseIISPlatformHandler(options => options.AuthenticationDescriptions.Clear());
@@ -94,14 +94,26 @@ namespace Disco.Billing.WebUI
 
             app.UseIdentity();
 
+            app.UseGoogleAuthentication(options =>
+            {
+                options.ClientId = "978876467322-8u3a6jjhpmoal1tllm94gs0edbv7en0k.apps.googleusercontent.com";
+                options.ClientSecret = "1dHoY0hIZ2Ms7g1iEIDTyz3y";
+            });
+
+            app.UseCookieAuthentication(options =>
+            {
+                options.AuthenticationScheme = "GoogleAuthCookieMiddlewareInstance";
+                options.LoginPath = new PathString("/Account/Login/");
+                options.AccessDeniedPath = new PathString("/Account/Forbidden/");
+                options.AutomaticAuthenticate = true;
+                options.AutomaticChallenge = true;
+                options.SlidingExpiration = true;
+                options.ExpireTimeSpan = TimeSpan.FromHours(1);
+            });
+
             // To configure external authentication please see http://go.microsoft.com/fwlink/?LinkID=532715
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseMvc(routes => { routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}"); });
         }
 
         // Entry point for the application.
